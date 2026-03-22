@@ -1,241 +1,477 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>お金管理アプリ</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>お金管理アプリ</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-<style>
-body{font-family:Arial;margin:0;padding:16px;background:#f5f7fb}
-.container{max-width:700px;margin:0 auto}
-.card{background:#fff;border-radius:12px;padding:16px;margin-bottom:16px;box-shadow:0 3px 10px rgba(0,0,0,.08)}
-input,select,button{width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ccc}
-button{cursor:pointer;font-weight:bold}
-.btn-main{background:#2563eb;color:#fff;border:none}
-.btn-sub{background:#10b981;color:#fff;border:none}
-.btn-danger{background:#ef4444;color:#fff;border:none}
-.summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-.summary div{background:#eef4ff;padding:10px;border-radius:8px}
-.category{border:1px solid #ddd;padding:10px;margin-top:10px;border-radius:8px}
-</style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f7fb;
+      color: #222;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      margin-top: 12px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 16px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 12px;
+    }
+
+    .btn-main {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-sub {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-box {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .summary-item {
+      background: #eef4ff;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .summary-item strong {
+      display: block;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #444;
+    }
+
+    .summary-item span {
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    .category-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 12px;
+      background: #fafafa;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .history-item {
+      border-bottom: 1px solid #eee;
+      padding: 10px 0;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .row-2 {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    @media (max-width: 600px) {
+      .row-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .top-note {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.6;
+    }
+
+    .category-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .category-actions button {
+      width: auto;
+      flex: 1;
+      padding: 10px;
+    }
+
+    .danger-text {
+      color: #dc2626;
+      font-weight: bold;
+    }
+
+    .ok-text {
+      color: #059669;
+      font-weight: bold;
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
+  <div class="container">
+    <h1>お金管理アプリ</h1>
+    <p class="top-note">
+      月の予算を決めて、項目ごとに管理するアプリです。<br>
+      支出を入れると残り金額が自動で減ります。
+    </p>
 
-<h1>お金管理アプリ</h1>
+    <div class="card">
+      <h2>① 月全体の設定</h2>
+      <label for="monthlyBudget">月の予算（円）</label>
+      <input type="number" id="monthlyBudget" placeholder="例：50000" />
 
-<div class="card">
-<h2>月予算</h2>
-<input type="number" id="monthlyBudget">
-<button class="btn-main" onclick="saveMonthlyBudget()">保存</button>
-</div>
+      <button class="btn-main" onclick="saveMonthlyBudget()">月予算を保存</button>
+    </div>
 
-<div class="card">
-<h2>項目追加</h2>
-<input type="text" id="categoryName" placeholder="項目名">
-<input type="number" id="categoryBudget" placeholder="予算">
-<button class="btn-sub" onclick="addCategory()">追加</button>
-</div>
+    <div class="card">
+      <h2>② 管理項目を追加</h2>
+      <label for="categoryName">項目名</label>
+      <input type="text" id="categoryName" placeholder="例：自己投資 / 遊び・体験 / 娯楽" />
 
-<div class="card">
-<h2>支出追加</h2>
-<select id="expenseCategory"></select>
-<input type="number" id="expenseAmount" placeholder="金額">
-<input type="text" id="expenseMemo" placeholder="メモ">
-<button class="btn-main" onclick="addExpense()">追加</button>
-</div>
+      <label for="categoryBudget">その項目の予算（円）</label>
+      <input type="number" id="categoryBudget" placeholder="例：22000" />
 
-<div class="card">
-<h2>全体状況</h2>
-<div class="summary">
-<div>予算<br><strong id="totalBudgetView">0円</strong></div>
-<div>使用<br><strong id="totalSpentView">0円</strong></div>
-<div>残り<br><strong id="remainingView">0円</strong></div>
-</div>
-</div>
+      <button class="btn-sub" onclick="addCategory()">項目を追加</button>
+    </div>
 
-<div class="card">
-<h2>項目一覧</h2>
-<div id="categoriesList"></div>
-</div>
+    <div class="card">
+      <h2>③ 支出を入力</h2>
+      <label for="expenseCategory">どの項目で使った？</label>
+      <select id="expenseCategory"></select>
 
-<div class="card">
-<h2>履歴</h2>
-<div id="historyList"></div>
-</div>
+      <label for="expenseAmount">使った金額（円）</label>
+      <input type="number" id="expenseAmount" placeholder="例：1500" />
 
-<div class="card">
-<button class="btn-danger" onclick="resetAllData()">全部リセット</button>
-</div>
+      <label for="expenseMemo">メモ（任意）</label>
+      <input type="text" id="expenseMemo" placeholder="例：参考書 / 友達とカフェ" />
 
-</div>
+      <button class="btn-main" onclick="addExpense()">支出を追加</button>
+    </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    <div class="card">
+      <h2>④ 全体の残り金額</h2>
+      <div class="summary-box">
+        <div class="summary-item">
+          <strong>月の予算</strong>
+          <span id="totalBudgetView">0円</span>
+        </div>
+        <div class="summary-item">
+          <strong>使った合計</strong>
+          <span id="totalSpentView">0円</span>
+        </div>
+        <div class="summary-item">
+          <strong>残り</strong>
+          <span id="remainingView">0円</span>
+        </div>
+      </div>
+    </div>
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB-ZpOateSymeJnHnBa_jOZ2omqJ6uuqBA",
-  authDomain: "money-app-project-2e35f.firebaseapp.com",
-  projectId: "money-app-project-2e35f",
-  storageBucket: "money-app-project-2e35f.firebasestorage.app",
-  messagingSenderId: "895254704145",
-  appId: "1:895254704145:web:18edd1fe739cb292bf01b0"
-};
+    <div class="card">
+      <h2>⑤ 項目ごとの状況</h2>
+      <div id="categoriesList"></div>
+    </div>
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+    <div class="card">
+      <h2>⑥ 支出履歴</h2>
+      <div id="historyList"></div>
+    </div>
 
-let appData = {
-  monthlyBudget: 0,
-  categories: [],
-  expenses: []
-};
+    <div class="card">
+      <h2>⑦ データ操作</h2>
+      <button class="btn-danger" onclick="resetAllData()">全部リセット</button>
+    </div>
+  </div>
 
-function formatYen(v){
-  return Number(v).toLocaleString("ja-JP")+"円";
-}
+  <script>
+    let appData = {
+      monthlyBudget: 0,
+      categories: [],
+      expenses: []
+    };
 
-async function saveData(){
-  await setDoc(doc(db,"appData","main"),appData);
-}
+    function saveData() {
+      localStorage.setItem("moneyAppData", JSON.stringify(appData));
+    }
 
-async function loadData(){
-  const snap = await getDoc(doc(db,"appData","main"));
-  if(snap.exists()){
-    appData = snap.data();
-  }
-  render();
-}
+    function loadData() {
+      const saved = localStorage.getItem("moneyAppData");
+      if (saved) {
+        appData = JSON.parse(saved);
+      }
+    }
 
-function saveMonthlyBudget(){
-  appData.monthlyBudget = Number(document.getElementById("monthlyBudget").value)||0;
-  saveData();
-  render();
-}
+    function formatYen(value) {
+      return Number(value).toLocaleString("ja-JP") + "円";
+    }
 
-function addCategory(){
-  const name=document.getElementById("categoryName").value.trim();
-  const budget=Number(document.getElementById("categoryBudget").value);
-  if(!name||isNaN(budget))return;
+    function saveMonthlyBudget() {
+      const value = Number(document.getElementById("monthlyBudget").value);
+      if (value < 0 || isNaN(value)) {
+        alert("正しい月予算を入力してください。");
+        return;
+      }
+      appData.monthlyBudget = value;
+      saveData();
+      render();
+      alert("月予算を保存しました。");
+    }
 
-  appData.categories.push({
-    id:Date.now(),
-    name,
-    budget
-  });
+    function addCategory() {
+      const name = document.getElementById("categoryName").value.trim();
+      const budget = Number(document.getElementById("categoryBudget").value);
 
-  document.getElementById("categoryName").value="";
-  document.getElementById("categoryBudget").value="";
+      if (!name) {
+        alert("項目名を入力してください。");
+        return;
+      }
 
-  saveData();
-  render();
-}
+      if (isNaN(budget) || budget < 0) {
+        alert("正しい予算を入力してください。");
+        return;
+      }
 
-function addExpense(){
-  const categoryId=Number(document.getElementById("expenseCategory").value);
-  const amount=Number(document.getElementById("expenseAmount").value);
-  const memo=document.getElementById("expenseMemo").value;
+      const exists = appData.categories.some(c => c.name === name);
+      if (exists) {
+        alert("同じ名前の項目はすでにあります。");
+        return;
+      }
 
-  if(isNaN(amount)||amount<=0)return;
+      appData.categories.push({
+        id: Date.now(),
+        name,
+        budget
+      });
 
-  appData.expenses.push({
-    id:Date.now(),
-    categoryId,
-    amount,
-    memo,
-    date:new Date().toLocaleString("ja-JP")
-  });
+      document.getElementById("categoryName").value = "";
+      document.getElementById("categoryBudget").value = "";
 
-  document.getElementById("expenseAmount").value="";
-  document.getElementById("expenseMemo").value="";
+      saveData();
+      render();
+      alert("項目を追加しました。");
+    }
 
-  saveData();
-  render();
-}
+    function addExpense() {
+      if (appData.categories.length === 0) {
+        alert("先に管理項目を追加してください。");
+        return;
+      }
 
-function deleteCategory(id){
-  appData.categories = appData.categories.filter(c=>c.id!==id);
-  saveData();
-  render();
-}
+      const categoryId = Number(document.getElementById("expenseCategory").value);
+      const amount = Number(document.getElementById("expenseAmount").value);
+      const memo = document.getElementById("expenseMemo").value.trim();
 
-function deleteExpense(id){
-  appData.expenses = appData.expenses.filter(e=>e.id!==id);
-  saveData();
-  render();
-}
+      if (isNaN(amount) || amount <= 0) {
+        alert("正しい金額を入力してください。");
+        return;
+      }
 
-function resetAllData(){
-  appData = {monthlyBudget:0,categories:[],expenses:[]};
-  saveData();
-  render();
-}
+      appData.expenses.push({
+        id: Date.now(),
+        categoryId,
+        amount,
+        memo,
+        date: new Date().toLocaleString("ja-JP")
+      });
 
-function getCategorySpent(id){
-  return appData.expenses
-    .filter(e=>e.categoryId===id)
-    .reduce((s,e)=>s+e.amount,0);
-}
+      document.getElementById("expenseAmount").value = "";
+      document.getElementById("expenseMemo").value = "";
 
-function render(){
-  document.getElementById("monthlyBudget").value = appData.monthlyBudget||"";
+      saveData();
+      render();
+      alert("支出を追加しました。");
+    }
 
-  const totalSpent = appData.expenses.reduce((s,e)=>s+e.amount,0);
-  document.getElementById("totalBudgetView").textContent = formatYen(appData.monthlyBudget);
-  document.getElementById("totalSpentView").textContent = formatYen(totalSpent);
-  document.getElementById("remainingView").textContent = formatYen(appData.monthlyBudget-totalSpent);
+    function deleteCategory(categoryId) {
+      const used = appData.expenses.some(e => e.categoryId === categoryId);
+      if (used) {
+        alert("この項目には支出履歴があるので削除できません。");
+        return;
+      }
 
-  const select=document.getElementById("expenseCategory");
-  select.innerHTML="";
-  appData.categories.forEach(c=>{
-    const o=document.createElement("option");
-    o.value=c.id;
-    o.textContent=c.name;
-    select.appendChild(o);
-  });
+      appData.categories = appData.categories.filter(c => c.id !== categoryId);
+      saveData();
+      render();
+    }
 
-  const catBox=document.getElementById("categoriesList");
-  catBox.innerHTML="";
-  appData.categories.forEach(c=>{
-    const spent=getCategorySpent(c.id);
-    const div=document.createElement("div");
-    div.className="category";
-    div.innerHTML=`
-      <strong>${c.name}</strong><br>
-      予算：${formatYen(c.budget)}<br>
-      使用：${formatYen(spent)}<br>
-      残り：${formatYen(c.budget-spent)}<br>
-      <button onclick="deleteCategory(${c.id})" class="btn-danger">削除</button>
-    `;
-    catBox.appendChild(div);
-  });
+    function deleteExpense(expenseId) {
+      appData.expenses = appData.expenses.filter(e => e.id !== expenseId);
+      saveData();
+      render();
+    }
 
-  const history=document.getElementById("historyList");
-  history.innerHTML="";
-  [...appData.expenses].reverse().forEach(e=>{
-    const c=appData.categories.find(x=>x.id===e.categoryId);
-    const div=document.createElement("div");
-    div.innerHTML=`
-      <strong>${formatYen(e.amount)}</strong> / ${c?c.name:"不明"}<br>
-      ${e.memo||""}<br>
-      <button onclick="deleteExpense(${e.id})" class="btn-danger">削除</button>
-      <hr>
-    `;
-    history.appendChild(div);
-  });
-}
+    function resetAllData() {
+      const ok = confirm("本当に全部リセットしますか？");
+      if (!ok) return;
 
-window.saveMonthlyBudget = saveMonthlyBudget;
-window.addCategory = addCategory;
-window.addExpense = addExpense;
-window.deleteCategory = deleteCategory;
-window.deleteExpense = deleteExpense;
-window.resetAllData = resetAllData;
+      appData = {
+        monthlyBudget: 0,
+        categories: [],
+        expenses: []
+      };
 
-window.onload = loadData;
-</script>
+      saveData();
+      render();
+      alert("全部リセットしました。");
+    }
 
+    function getCategorySpent(categoryId) {
+      return appData.expenses
+        .filter(e => e.categoryId === categoryId)
+        .reduce((sum, e) => sum + e.amount, 0);
+    }
+
+    function renderSummary() {
+      const totalBudget = appData.monthlyBudget;
+      const totalSpent = appData.expenses.reduce((sum, e) => sum + e.amount, 0);
+      const remaining = totalBudget - totalSpent;
+
+      document.getElementById("monthlyBudget").value = appData.monthlyBudget || "";
+      document.getElementById("totalBudgetView").textContent = formatYen(totalBudget);
+      document.getElementById("totalSpentView").textContent = formatYen(totalSpent);
+
+      const remainingView = document.getElementById("remainingView");
+      remainingView.textContent = formatYen(remaining);
+      remainingView.className = remaining < 0 ? "danger-text" : "ok-text";
+    }
+
+    function renderCategories() {
+      const box = document.getElementById("categoriesList");
+      box.innerHTML = "";
+
+      if (appData.categories.length === 0) {
+        box.innerHTML = "<p class='small'>まだ項目がありません。</p>";
+        return;
+      }
+
+      appData.categories.forEach(category => {
+        const spent = getCategorySpent(category.id);
+        const remaining = category.budget - spent;
+
+        const div = document.createElement("div");
+        div.className = "category-card";
+        div.innerHTML = `
+          <h3>${category.name}</h3>
+          <p>予算：${formatYen(category.budget)}</p>
+          <p>使った額：${formatYen(spent)}</p>
+          <p>残り：<span class="${remaining < 0 ? "danger-text" : "ok-text"}">${formatYen(remaining)}</span></p>
+          <div class="category-actions">
+            <button class="btn-danger" onclick="deleteCategory(${category.id})">この項目を削除</button>
+          </div>
+        `;
+        box.appendChild(div);
+      });
+    }
+
+    function renderExpenseSelect() {
+      const select = document.getElementById("expenseCategory");
+      select.innerHTML = "";
+
+      if (appData.categories.length === 0) {
+        const option = document.createElement("option");
+        option.textContent = "先に項目を追加してください";
+        option.value = "";
+        select.appendChild(option);
+        return;
+      }
+
+      appData.categories.forEach(category => {
+        const option = document.createElement("option");
+        option.value = category.id;
+        option.textContent = category.name;
+        select.appendChild(option);
+      });
+    }
+
+    function renderHistory() {
+      const box = document.getElementById("historyList");
+      box.innerHTML = "";
+
+      if (appData.expenses.length === 0) {
+        box.innerHTML = "<p class='small'>まだ支出履歴がありません。</p>";
+        return;
+      }
+
+      const reversed = [...appData.expenses].reverse();
+
+      reversed.forEach(expense => {
+        const category = appData.categories.find(c => c.id === expense.categoryId);
+        const div = document.createElement("div");
+        div.className = "history-item";
+        div.innerHTML = `
+          <p><strong>${formatYen(expense.amount)}</strong> / ${category ? category.name : "不明な項目"}</p>
+          <p class="small">メモ：${expense.memo || "なし"}</p>
+          <p class="small">日時：${expense.date}</p>
+          <button class="btn-danger" onclick="deleteExpense(${expense.id})">この支出を削除</button>
+        `;
+        box.appendChild(div);
+      });
+    }
+
+    function render() {
+      renderSummary();
+      renderExpenseSelect();
+      renderCategories();
+      renderHistory();
+    }
+
+    loadData();
+    render();
+  </script>
 </body>
 </html>
